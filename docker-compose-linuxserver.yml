@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  nextcloud:
+    image: linuxserver/nextcloud
+    container_name: nextcloud
+    hostname: nextcloud
+#    restart: always
+    ports:
+      - 8085:443
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Asia/Dhaka
+    volumes:
+      - config:/config
+      - /media/usb1:/data
+    networks:
+      - nextcloud
+
+volumes:
+  config:
+
+networks:
+  nextcloud:

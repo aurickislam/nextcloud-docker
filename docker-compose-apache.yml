@@ -1,36 +1,35 @@
 version: '3.7'
 
-volumes:
-  nextcloud:
-  mariadb:
-  redis:
-
 services:
   nextcloud:
     image: nextcloud:18-apache
     container_name: nextcloud
+    hostname: nextcloud
 #    restart: always
     ports:
       - 8085:80
     environment:
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=nextcloud
-      - MYSQL_HOST=mariadb
-      - NEXTCLOUD_ADMIN_USER=admin
-      - NEXTCLOUD_ADMIN_PASSWORD=admin
-      - NEXTCLOUD_TRUSTED_DOMAINS=192.168.88.17
-      - REDIS_HOST=redis
-      - REDIS_HOST_PORT=6379
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: nextcloud
+      MYSQL_HOST: mariadb
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: admin
+      NEXTCLOUD_TRUSTED_DOMAINS: 192.168.88.17
+      REDIS_HOST: redis
+      REDIS_HOST_PORT: 6379
     volumes:
       - nextcloud:/var/www/html
+    networks:
+      - nextcloud
     depends_on:
       - mariadb
       - redis
 
   mariadb:
     image: mariadb:10
-#    container_name: mariadb
+    container_name: nextcloud-mariadb
+    hostname: nextcloud-mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: always
     environment:
@@ -40,10 +39,21 @@ services:
       MYSQL_PASSWORD: nextcloud
     volumes:
       - mariadb:/var/lib/mysql
+    networks:
+      - nextcloud
 
   redis:
     image: redis:latest
-#    container_name: redis
+    container_name: nextcloud-redis
+    hostname: nextcloud-redis
     restart: always
     volumes:
       - redis:/data
+
+volumes:
+  nextcloud:
+  mariadb:
+  redis:
+
+networks:
+  nextcloud:
